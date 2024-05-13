@@ -1,0 +1,212 @@
+<!-- form.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title><%= type %> Form</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.1.0/css/adminlte.min.css"
+    />
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+      <!-- Navbar -->
+      <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+        <!-- Left navbar links -->
+        <ul class="navbar-nav">
+          <li class="nav-item">
+            <a class="nav-link" data-widget="pushmenu" href="#" role="button"
+              ><i class="fas fa-bars"></i
+            ></a>
+          </li>
+        </ul>
+      </nav>
+      <!-- /.navbar -->
+
+      <!-- Main Sidebar Container -->
+      <aside class="main-sidebar sidebar-dark-primary elevation-4">
+        <!-- Brand Logo -->
+        <a href="#" class="brand-link">
+          <span class="brand-text font-weight-light">Server Monitor</span>
+        </a>
+
+        <!-- Sidebar -->
+        <div class="sidebar">
+          <!-- Sidebar Menu -->
+          <nav class="mt-2">
+            <ul
+              class="nav nav-pills nav-sidebar flex-column"
+              data-widget="treeview"
+              role="menu"
+            >
+              <li class="nav-item">
+                <a href="/" class="nav-link">
+                  <i class="nav-icon fas fa-arrow-left"></i>
+                  <p>Back to Home</p>
+                </a>
+              </li>
+            </ul>
+          </nav>
+          <!-- /.sidebar-menu -->
+        </div>
+        <!-- /.sidebar -->
+      </aside>
+
+      <!-- Content Wrapper. Contains page content -->
+      <div class="content-wrapper">
+        <!-- Content Header (Page header) -->
+        <div class="content-header">
+          <div class="container-fluid">
+            <div class="row mb-2">
+              <div class="col-sm-6">
+                <h1 class="m-0">
+                  <%= type.charAt(0).toUpperCase() + type.slice(1) %> Form
+                </h1>
+              </div>
+              <!-- /.col -->
+            </div>
+            <!-- /.row -->
+          </div>
+          <!-- /.container-fluid -->
+        </div>
+        <!-- /.content-header -->
+
+        <!-- Main content -->
+        <section class="content">
+          <div class="container-fluid">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="card card-primary">
+                  <div class="card-header">
+                    <h3 class="card-title">Server Details</h3>
+                  </div>
+                  <!-- /.card-header -->
+                  <!-- form start -->
+                  <form role="form" action="/addServer" method="post">
+                    <div class="card-body">
+                      <div class="form-group">
+                        <label for="appName">App Name:*</label>
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="appName"
+                          name="appName"
+                          placeholder="Enter app name"
+                          required
+                        />
+                      </div>
+                      <div class="form-group">
+                        <label for="frontend">Frontend Server:*</label>
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="frontend"
+                          name="frontend"
+                          placeholder="Enter domain & frontend server IP (domain,ip)"
+                          required
+                        />
+                      </div>
+                      <div class="form-group" id="isPublicField">
+                        <label for="isPublic">Public IP:</label>
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="isPublic"
+                          name="isPublic"
+                          placeholder="Enter Public IP if exist"
+                        />
+                      </div>
+                      <div class="form-group">
+                        <button
+                          type="button"
+                          class="btn btn-primary"
+                          id="toggleReverseProxy"
+                        >
+                          Exclude Reverse Proxy
+                        </button>
+                      </div>
+                      <div class="form-group" id="reverseProxyField">
+                        <label for="reverseProxy">Reverse Proxy IP:</label>
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="reverseProxy"
+                          name="reverseProxy"
+                          placeholder="Enter reverse proxy IP"
+                        />
+                      </div>
+                      <div class="form-group">
+                        <label for="backend">Backend Server IP:*</label>
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="backend"
+                          name="backend"
+                          placeholder="Enter backend server IP"
+                          required
+                        />
+                      </div>
+                      <div class="form-group">
+                        <label for="database">Database Server IP:*</label>
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="database"
+                          name="database"
+                          placeholder="Enter database server IP"
+                          required
+                        />
+                      </div>
+                    </div>
+                    <!-- /.card-body -->
+
+                    <div class="card-footer">
+                      <button type="submit" class="btn btn-primary">
+                        Save
+                      </button>
+                    </div>
+                  </form>
+                </div>
+                <!-- /.card -->
+              </div>
+            </div>
+          </div>
+        </section>
+        <!-- /.content -->
+      </div>
+      <!-- /.content-wrapper -->
+
+      <!-- Main Footer -->
+      <footer class="main-footer">
+        <strong>Server Relationship Monitor</strong>
+      </footer>
+    </div>
+    <!-- ./wrapper -->
+
+    <!-- REQUIRED SCRIPTS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.1.0/js/adminlte.min.js"></script>
+    <script>
+      $(document).ready(function () {
+        $("#toggleReverseProxy").click(function () {
+          if ($("#reverseProxyField").is(":visible")) {
+            // Hide the Reverse Proxy IP field when the button is clicked
+            $("#reverseProxyField").hide();
+            $(this).text("Include Reverse Proxy");
+          } else {
+            // Show the Reverse Proxy IP field when the button is clicked
+            $("#reverseProxyField").show();
+            $(this).text("Exclude Reverse Proxy");
+          }
+        });
+      });
+    </script>
+  </body>
+</html>

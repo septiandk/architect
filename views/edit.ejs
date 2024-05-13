@@ -1,0 +1,289 @@
+<!-- edit.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Edit Server - <%= server.appName %>
+  </title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.1.0/css/adminlte.min.css" />
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+
+<body class="hold-transition sidebar-mini">
+  <div class="wrapper">
+    <!-- Navbar -->
+    <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+      <!-- Left navbar links -->
+      <ul class="navbar-nav">
+        <li class="nav-item">
+          <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+        </li>
+      </ul>
+    </nav>
+    <!-- /.navbar -->
+
+    <!-- Main Sidebar Container -->
+    <aside class="main-sidebar sidebar-dark-primary elevation-4">
+      <!-- Brand Logo -->
+      <a href="#" class="brand-link">
+        <span class="brand-text font-weight-light">Server Monitor</span>
+      </a>
+
+      <!-- Sidebar -->
+      <div class="sidebar">
+        <!-- Sidebar Menu -->
+        <nav class="mt-2">
+          <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
+            <li class="nav-item">
+              <a href="/" class="nav-link">
+                <i class="nav-icon fas fa-arrow-left"></i>
+                <p>Back to Home</p>
+              </a>
+            </li>
+          </ul>
+        </nav>
+        <!-- /.sidebar-menu -->
+      </div>
+      <!-- /.sidebar -->
+    </aside>
+
+    <!-- Content Wrapper. Contains page content -->
+    <div class="content-wrapper">
+      <!-- Content Header (Page header) -->
+      <div class="content-header">
+        <div class="container-fluid">
+          <div class="row mb-2">
+            <div class="col-sm-6">
+              <h1 class="m-0">Edit Server - <%= server.appName %>
+              </h1>
+            </div>
+            <!-- /.col -->
+          </div>
+          <!-- /.row -->
+        </div>
+        <!-- /.container-fluid -->
+      </div>
+      <!-- /.content-header -->
+
+      <!-- Main content -->
+      <section class="content">
+        <div class="container-fluid">
+          <div class="row">
+            <div class="col-md-6">
+              <div class="card card-primary">
+                <div class="card-header">
+                  <h3 class="card-title">Server Details</h3>
+                </div>
+                <!-- /.card-header -->
+                <!-- form start -->
+                <form role="form" action="/edit/<%= server.appName %>" method="post">
+                  <div class="card-body">
+                    <div class="form-group">
+                      <label for="appName">App Name:</label>
+                      <input type="text" class="form-control" id="appName" name="appName" value="<%= server.appName %>"
+                        readonly />
+                    </div>
+                    <div class="form-group">
+                      <label for="frontend">Frontend Server :</label>
+                      <div id="frontendInputs">
+                          <% if (Array.isArray(server.frontend.ip)) { %>
+                              <div class="input-group">
+                                  <input type="text" class="form-control" name="frontend" value="<%= server.frontend.domain %>,<%= server.frontend.ip[0] %>" required />
+                              </div>
+                          <% } else if (server.frontend) { %>
+                              <div class="input-group">
+                                  <input type="text" class="form-control" name="frontend" value="<%= server.frontend.domain %>,<%= server.frontend.ip %>" required />
+                              </div>
+                          <% } else { %>
+                              <div class="input-group">
+                                  <input type="text" class="form-control" name="frontend" value="" required />
+                              </div>
+                          <% } %>
+                      </div>
+                      <button type="button" class="btn btn-sm btn-primary mt-2 ml-2 " id="addFrontend">
+                          <i class="fas fa-plus"></i>
+                      </button>
+                  </div>
+                  
+                    <div class="form-group">
+                      <label for="isPublic">Public Server IP:</label>
+                      <div id="isPublicInputs">
+                        <div class="input-group">
+                          <input type="text" class="form-control" name="isPublic" value="<%= server.isPublic %>"
+                             />
+                        </div>
+                      </div>
+                    </div>
+                            
+                    <div class="form-group">
+                      <button type="button" class="btn btn-primary" id="toggleReverseProxy">
+                        <% if (server.reverseProxy) { %> Exclude Reverse Proxy <% } else { %> Include Reverse Proxy <% }
+                              %>
+                      </button>
+                    </div>
+                    <div class="form-group" id="reverseProxyField" <% if (!server.reverseProxy) { %> style="display:
+                      none;" <% } %>
+                        >
+                        <label for="reverseProxy">Reverse Proxy IP:</label>
+                        <input type="text" class="form-control" id="reverseProxy" name="reverseProxy"
+                          value="<%= server.reverseProxy %>" required />
+                    </div>
+
+                    <div class="form-group">
+                      <label for="backend">Backend Server IP:</label>
+                      <div id="backendInputs">
+                        <% if (Array.isArray(server.backend)) { %>
+                          <% server.backend.forEach((backend, index)=> { %>
+                            <div class="input-group">
+                              <input type="text" class="form-control" name="backend" value="<%= backend %>" required />
+                              <% if (index !==0) { %>
+                                <button type="button" class="btn btn-danger remove-field">
+                                  <i class="fas fa-minus"></i>
+                                </button>
+                                <% } %>
+                            </div>
+                            <% }); %>
+                              <% } else { %>
+                                <input type="text" class="form-control" name="backend" value="<%= server.backend %>"
+                                  required />
+                                <% } %>
+                                 
+                      </div>
+                      <button type="button" class="btn btn-sm btn-primary mt-2 ml-2 " id="addBackend">
+                        <i class="fas fa-plus"></i>
+                      </button>
+                    </div>
+                    <div class="form-group">
+                      <label for="database">Database Server IP:</label>
+                      <div id="databaseInputs">
+                        <% if (Array.isArray(server.database)) { %>
+                          <% server.database.forEach((database, index)=> { %>
+                            <div class="input-group">
+                              <input type="text" class="form-control" name="database" value="<%= database %>"
+                                required />
+                              <% if (index !==0) { %>
+                                <button type="button" class="btn btn-danger remove-field">
+                                  <i class="fas fa-minus"></i>
+                                </button>
+                                <% } %>
+                            </div>
+                            <% }); %>
+                              <% } else { %>
+                                <input type="text" class="form-control" name="database" value="<%= server.database %>"
+                                  required />
+                                <% } %>
+                                  
+                      </div>
+                      <button type="button" class="btn btn-sm btn-primary mt-2 ml-2 " id="addDatabase">
+                        <i class="fas fa-plus"></i>
+                      </button>
+                    </div>
+                  </div>
+                  <!-- /.card-body -->
+
+                  <div class="card-footer">
+                    <button type="submit" class="btn btn-primary">
+                      Save
+                    </button>
+                  </div>
+                </form>
+              </div>
+              <!-- /.card -->
+            </div>
+          </div>
+        </div>
+      </section>
+      <!-- /.content -->
+      <div class="row justify-content-center">
+        <div class="col-md-6" style="max-width: max-content">
+          <div class="card card-primary">
+            <div class="card-header">
+              <h3 class="card-title">Diagram Preview</h3>
+            </div>
+            <!-- /.card-header -->
+            <div class="card-body">
+              <div class="diagram mt-4" id="diagramPreview">
+                <!-- Diagram Preview Content -->
+              </div>
+            </div>
+            <!-- /.card-body -->
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /.content-wrapper -->
+
+    <!-- Main Footer -->
+    <footer class="main-footer">
+      <strong>Server Relationship Monitor</strong>
+    </footer>
+  </div>
+  <!-- ./wrapper -->
+
+  <!-- REQUIRED SCRIPTS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.1.0/js/adminlte.min.js"></script>
+  <script src="https://d3js.org/d3.v7.min.js"></script>
+  <script src="/updateDiagram.js" defer></script>
+  <script>
+    $(document).ready(function () {
+      updateDiagram();
+
+      // Function to update the diagram when input fields change
+      $("#frontend, #reverseProxy, #backend, #database").on(
+        "input",
+        function () {
+          updateDiagram();
+        }
+      );
+
+      // Toggle Reverse Proxy IP field
+      $("#toggleReverseProxy").click(function () {
+        if ($("#reverseProxyField").is(":visible")) {
+          // Hide the Reverse Proxy IP field when the button is clicked
+          $("#reverseProxyField").hide();
+          $(this).text("Include Reverse Proxy");
+        } else {
+          // Show the Reverse Proxy IP field when the button is clicked
+          $("#reverseProxyField").show();
+          $(this).text("Exclude Reverse Proxy");
+        }
+      });
+
+      // Add frontend field
+      $("#addFrontend").click(function () {
+        const input = $(
+          '<div class="input-group"><input type="text" class="form-control" name="frontend" required><button type="button" class="btn btn-sm btn-danger remove-field"><i class="fas fa-minus"></i></button></div>'
+        );
+        $("#frontendInputs").append(input);
+      });
+
+      // Add backend field
+      $("#addBackend").click(function () {
+        const input = $(
+          '<div class="input-group"><input type="text" class="form-control" name="backend" required><button type="button" class="btn btn-sm btn-danger remove-field"><i class="fas fa-minus"></i></button></div>'
+        );
+        $("#backendInputs").append(input);
+      });
+
+      // Add database field
+      $("#addDatabase").click(function () {
+        const input = $(
+          '<div class="input-group"><input type="text" class="form-control" name="database" required><button type="button" class="btn btn-sm btn-danger remove-field"><i class="fas fa-minus"></i></button></div>'
+        );
+        $("#databaseInputs").append(input);
+      });
+
+      // Remove field
+      $(document).on("click", ".remove-field", function () {
+        $(this).parent().remove();
+        updateDiagram();
+      });
+    });
+  </script>
+</body>
+
+</html>

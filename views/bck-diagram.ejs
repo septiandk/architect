@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>
+        <%= server.appName %> Diagram
+    </title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.1.0/css/adminlte.min.css">
+    <link rel="stylesheet" href="/styles.css" />
+
+</head>
+
+<body class="hold-transition sidebar-mini">
+    <div class="wrapper">
+        <!-- Navbar -->
+        <nav class="main-header navbar navbar-expand navbar-white navbar-light">
+            <!-- Left navbar links -->
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
+                </li>
+            </ul>
+        </nav>
+        <!-- /.navbar -->
+
+        <!-- Main Sidebar Container -->
+        <aside class="main-sidebar sidebar-dark-primary elevation-4">
+            <!-- Brand Logo -->
+            <a href="#" class="brand-link">
+                <span class="brand-text font-weight-light">Server Monitor</span>
+            </a>
+
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <!-- Sidebar Menu -->
+                <nav class="mt-2">
+                    <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu">
+                        <li class="nav-item">
+                            <a href="/" class="nav-link">
+                                <i class="nav-icon fas fa-arrow-left"></i>
+                                <p>Back to Home</p>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+                <!-- /.sidebar-menu -->
+            </div>
+            <!-- /.sidebar -->
+        </aside>
+
+        <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper">
+            <!-- Content Header (Page header) -->
+            <div class="content-header">
+                <div class="container-fluid">
+                    <div class="row mb-2">
+                        <div class="col-sm-6">
+                            <h1 class="text-center mt-3">Diagram for <%= server.appName %>
+                            </h1>
+                        </div>
+                        <!-- /.col -->
+                    </div>
+                    <!-- /.row -->
+                </div>
+                <!-- /.container-fluid -->
+            </div>
+            <!-- /.content-header -->
+
+            <!-- Main content -->
+            <section class="content">
+                <div class="container-fluid">
+                    <div class="diagram mt-4" id="diagramPreview">
+                        <!-- Diagram Preview Content -->
+                    </div>
+                </div>
+            </section>
+            <!-- /.content -->
+        </div>
+        <!-- /.content-wrapper -->
+
+        <!-- Main Footer -->
+        <footer class="main-footer">
+            <strong>Server Relationship Monitor</strong>
+        </footer>
+    </div>
+    <!-- ./wrapper -->
+
+    <!-- REQUIRED SCRIPTS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/admin-lte/3.1.0/js/adminlte.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.7.0/d3.min.js"></script>
+    <script>
+        // Data for the diagram
+        const serverName = "<%= server.appName %>";
+        const frontend = "<%= server.frontend %>";
+        const reverseProxy = "<%= server.reverseProxy %>";
+        const backend = "<%= server.backend %>";
+        const database = "<%= server.database %>";
+
+        function cleanString(str) {
+            return str.replace(/^"|"$/g, "").split(",");
+        }
+
+        const jFrontend = cleanString(frontend);
+        const jBackend = cleanString(backend);
+        const jReverseProxy = cleanString(reverseProxy);
+        const jDatabase = cleanString(database);
+
+        const nodes = []; // Array to store node data
+
+        // Function to process server data and build nodes
+        function prepareNodes() {
+            // Add Frontend node
+            nodes.push({
+                id: "frontend",
+                label: "Frontend",
+                servers: Array.isArray(jFrontend) ? jFrontend : [jFrontend],
+            });
+
+            // Add Reverse Proxy (if exists)
+            if (jReverseProxy && jReverseProxy[0] !== "") {
+                nodes.push({
+                    id: "reverseProxy",
+                    label: "Reverse Proxy",
+                    servers: [jReverseProxy],
+                });
+            }
+
+            // Add Backend node
+            nodes.push({
+                id: "backend",
+                label: "Backend",
+                servers: Array.isArray(jBackend) ? jBackend : [jBackend],
+            });
+
+            // Add Database node
+            nodes.push({
+                id: "database",
+                label: "Database",
+                servers: Array.isArray(jDatabase) ? jDatabase : [jDatabase],
+            });
+
+            // Assign serverList to each node
+            nodes.forEach(node => {
+                if (node.servers.length > 1) {
+                    // Multiple IPs (keep existing logic)
+                    node.serverList = node.servers.join("\n");
+                } else {
+                    // Single IP
+                    node.serverList = node.servers[0];
+                }
+            });
+        }
+
+        // Function to create the diagram using d3.js
+        function createDiagram() {
+            const container = d3.select("#diagramPreview");
+
+            // Ensure container exists
+            if (!container.node()) return;
+
+            const width = container.node().getBoundingClientRect().width;
+            const height = container.node().getBoundingClientRect().height;
+
+            // Ensure container has valid width and height
+            if (width === 0 || height === 0) return;
+
+            const svg = container.append("svg")
+                .attr("width", width)
+                .attr("height", height);
+
+            // Define node dimensions and spacing
+            const nodeWidth = 100; // Set the width of the rectangle
+            const nodeHeight = 50; // Set the height of the rectangle
+            const nodeSpacing = 150; // Set the horizontal spacing between nodes
+
+            // Calculate node positions based on the number of nodes
+            const startY = height / 2 - nodeHeight / 2; // Start from center with vertical spacing
+
+            // Create node groups with horizontal positioning
+            const nodeGroups = svg.selectAll("g.node")
+                .data(nodes)
+                .enter()
+                .append("g")
+                .attr("class", "node")
+                .attr("transform", (d, i) => {
+                    const x = i * (nodeWidth + nodeSpacing) + nodeSpacing;
+                    return `translate(${x}, ${startY})`;
+                });
+
+            // Add node rectangles
+            nodeGroups.append("rect")
+                .attr("width", nodeWidth)
+                .attr("height", nodeHeight)
+                .attr("fill", "#f8f9fa")
+                .attr("stroke", "#343a40")
+                .attr("stroke-width", 2);
+
+            // Add node labels
+            nodeGroups.append("text")
+                .attr("x", nodeWidth / 2) // Center text within rectangle
+                .attr("y", nodeHeight / 2)
+                .attr("text-anchor", "middle") // Center text horizontally
+                .attr("dominant-baseline", "central") // Center text vertically
+                .text(d => d.label)
+                .attr("class", "node-label");
+
+            // Add server IP lists within nodes
+            nodeGroups.append("text")
+                .attr("x", nodeWidth / 2) // Center text within rectangle
+                .attr("y", nodeHeight + 20) // Position below node label
+                .attr("text-anchor", "middle")
+                .text(d => d.serverList)
+                .attr("class", "server-list");
+
+            drawArrows(nodeGroups);
+        }
+
+        // Function to draw arrows between nodes
+        function drawArrow(nodeGroups, sourceNode, targetNode) {
+            // Filter node groups based on ID
+            const sourceGroup = nodeGroups.filter(d => d.id === sourceNode);
+            const targetGroup = nodeGroups.filter(d => d.id === targetNode);
+            console.log(sourceGroup);
+            console.log(targetGroup);
+            // Check if groups are empty
+            if (sourceGroup.empty() || targetGroup.empty()) {
+                console.error("Source or target group not found.");
+                return;
+            }
+
+            // Select rectangle elements within each group
+            const sourceRect = sourceGroup.select("rect").node();
+            const targetRect = targetGroup.select("rect").node();
+            console.log(sourceRect);
+            console.log(targetRect);
+            // Check if rectangle elements exist
+            if (!sourceRect || !targetRect) {
+                console.error("Source or target rectangle not found.");
+                return;
+            }
+
+            console.log(sourceRect.x);
+            // Extract positions from rectangle attributes
+            const sourceX = +sourceRect.getAttribute("x") + (+sourceRect.getAttribute("width") / 2);
+            const sourceY = +sourceRect.getAttribute("y") + (+sourceRect.getAttribute("height") / 2);
+            const targetX = +targetRect.getAttribute("x") + (+targetRect.getAttribute("width") / 2);
+            const targetY = +targetRect.getAttribute("y") + (+targetRect.getAttribute("height") / 2);
+
+            // Draw arrow line
+            const svg = d3.select("#diagramPreview svg");
+            const line = svg.append("line")
+                .attr("x1", sourceX)
+                .attr("y1", sourceY)
+                .attr("x2", targetX)
+                .attr("y2", targetY)
+                .attr("class", "arrow");
+
+            // Add arrow marker (triangle)
+            line.attr("marker-end", "url(#arrow)")
+                .attr("marker-start", "url(#arrow-start)");
+
+                svg.append("defs").append("marker")
+        .attr("id", "arrow")
+        .attr("markerUnits", "strokeWidth")
+        .attr("markerWidth", 12)
+        .attr("markerHeight", 12)
+        .attr("viewBox", "0 0 12 12")
+        .attr("refX", 6) // Adjust marker position
+        .attr("refY", 6)
+        .attr("orient", "auto") // Let the browser decide the orientation
+        .append("path")
+        .attr("d", "M2,2 L10,6 L2,10 L6,6 L2,2")
+        .style("fill", "#000");
+
+    svg.append("defs").append("marker")
+        .attr("id", "arrow-start")
+        .attr("markerUnits", "strokeWidth")
+        .attr("markerWidth", 12)
+        .attr("markerHeight", 12)
+        .attr("viewBox", "0 0 12 12")
+        .attr("refX", 6) // Adjust marker position
+        .attr("refY", 6)
+        .attr("orient", "auto") // Let the browser decide the orientation
+        .append("path")
+        .attr("d", "M2,2 L10,6 L2,10 L6,6 L2,2")
+        .style("fill", "#000");
+
+        }
+
+        // Function to draw arrows based on node connections
+        function drawArrows(nodeGroups) {
+            const backendNode = nodes.find(node => node.id === "backend");
+            const reverseProxyNode = nodes.find(node => node.id === "reverseProxy");
+            if (backendNode) {
+                drawArrow(nodeGroups, "frontend", "backend");
+                drawArrow(nodeGroups, "backend", "database")
+            }
+            if (reverseProxyNode && reverseProxyNode.servers[0] !== "") {
+                drawArrow(nodeGroups, "frontend", "reverseProxy");
+                drawArrow(nodeGroups, "reverseProxy", "backend")
+                drawArrow(nodeGroups, "backend", "database")
+            }
+        }
+
+        // Call functions to prepare data and create diagram
+        prepareNodes();
+        createDiagram();
+    </script>
+
+</body>
+
+</html>
