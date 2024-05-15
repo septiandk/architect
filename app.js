@@ -33,7 +33,7 @@ app.get('/diagram/:appName', (req, res) => {
 
 app.get('/form/:type', (req, res) => {
     const type = req.params.type;
-    res.render('form', { type });
+    res.render('forms/diagramform', { type });
 });
 
 app.post('/addServer', (req, res) => {

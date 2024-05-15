@@ -122,4 +122,24 @@
     background-color: #ddd;
   }
   
-  
+  /* info container */
+  .info-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .info-container .card {
+    margin: 10px;
+    height: 180px;
+    width: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+.card-data {
+    margin-top: 5px;
+    text-align: center;
+    height: 100px;
+  }
