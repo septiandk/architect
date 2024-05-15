@@ -1,0 +1,20 @@
+version: '3.0'
+
+services:
+  architect-app:
+    container_name: architect-app
+    build:
+      context: .
+      dockerfile: Dockerfile
+#    env_file:
+#      - .env
+    ports:
+      - "3001:3001"
+    volumes:
+      - ./servers.json:/app/servers.json
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+    driver: bridge

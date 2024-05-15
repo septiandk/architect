@@ -1,44 +1,45 @@
 [
   {
-    "appName": "oss-satria",
-    "frontend": {
-      "domain": "https://satria-beams.snt.co.id",
-      "ip": [
-        "172.20.20.10"
-      ]
-    },
-    "reverseProxy": "172.20.13.100",
-    "backend": [
-      "172.20.64.101",
-      "172.20.64.102",
-      "172.20.64.103"
-    ],
-    "database": "172.20.13.101"
-  },
-  {
-    "appName": "test app1",
-    "frontend": {
-      "domain": "",
-      "ip": [
-        "172.20.20.11"
-      ]
-    },
-    "isPublic": "103.169.120.23",
-    "reverseProxy": "172.20.13.100",
-    "backend": "172.20.64.102",
-    "database": "172.20.12.102"
-  },
-  {
     "appName": "dev-cboss-new",
     "frontend": {
       "domain": "https://dev-cboss.psngroup.cloud",
       "ip": [
-        "172.20.20.10"
+        "172.20.20.11"
       ]
     },
     "isPublic": "",
     "reverseProxy": "",
     "backend": "172.20.20.11",
-    "database": "172.20.12.102"
+    "database": [
+      "192.168.41.95",
+      "192.168.41.216",
+      "172.20.12.67"
+    ]
+  },
+  {
+    "appName": "cboss-kanban",
+    "frontend": {
+      "domain": "https://cboss-kanban.psngroup.cloud",
+      "ip": [
+        "172.20.20.11"
+      ]
+    },
+    "isPublic": "",
+    "reverseProxy": "",
+    "backend": "172.20.20.11",
+    "database": "172.20.12.67"
+  },
+  {
+    "appName": "cboss-useradmin",
+    "frontend": {
+      "domain": "https://cboss-administrator.psngroup.cloud",
+      "ip": [
+        "172.20.20.11"
+      ]
+    },
+    "isPublic": "",
+    "reverseProxy": "",
+    "backend": "172.20.20.11",
+    "database": "192.168.41.95"
   }
 ]

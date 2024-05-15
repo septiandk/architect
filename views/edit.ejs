@@ -129,7 +129,7 @@
                         >
                         <label for="reverseProxy">Reverse Proxy IP:</label>
                         <input type="text" class="form-control" id="reverseProxy" name="reverseProxy"
-                          value="<%= server.reverseProxy %>" required />
+                          value="<%= server.reverseProxy %>" />
                     </div>
 
                     <div class="form-group">
@@ -163,7 +163,7 @@
                           <% server.database.forEach((database, index)=> { %>
                             <div class="input-group">
                               <input type="text" class="form-control" name="database" value="<%= database %>"
-                                required />
+                                  <%= server.backend ? 'required' : '' %> />
                               <% if (index !==0) { %>
                                 <button type="button" class="btn btn-danger remove-field">
                                   <i class="fas fa-minus"></i>

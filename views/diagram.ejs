@@ -88,8 +88,20 @@
                                 <span class="server-ip"><%= server.backend %></span>
                             <% } %>
                             <div class="arrow"></div>
-                            <div class="node-label">Database</div>
-                            <span class="server-ip"><%= server.database %></span>
+                            <% if (Array.isArray(server.database)) { %>
+                                <div class="arrow"></div>
+                                    <div class="node-label">Database</div>
+                                    <div class="backend-ips">
+                                        <% server.database.forEach((database, index) => { %>
+                                            <span class="server-ip"><%= database %></span>
+                                        <% }); %>
+                                    </div>
+                            <% } else { %>
+                                <div class="node-label">Database</div>
+                                <span class="server-ip"><%= server.database %></span>
+                            <% } %>
+                            <!-- <div class="node-label">Database</div> -->
+                            <!-- <span class="server-ip"><%= server.database %></span> -->
                         </div>
                     </div>
                 </div>
@@ -119,7 +131,7 @@
                         %>
                         <p>This app has no public IP</p>
                     <% } %>
-                    <p>App has connected storage to NFS on server 172.20.66.210</p>
+                    <!-- <p>App has connected storage to NFS on server 172.20.66.210</p> -->
                 </div>                
             </section>
             <!-- /.content -->

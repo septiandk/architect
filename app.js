@@ -80,33 +80,30 @@ app.post('/edit/:appName', (req, res) => {
             }
         }
 
-        // Update other fields
         if (isPublic !== undefined) updatedServer.isPublic = isPublic;
         if (reverseProxy) updatedServer.reverseProxy = reverseProxy;
         if (backend) updatedServer.backend = backend;
         if (database) updatedServer.database = database;
 
-        servers[index] = updatedServer; // Update the server object in the array
-        saveServers(); // Save the updated servers array
+        servers[index] = updatedServer;
+        saveServers();
     }
     res.redirect('/');
 });
 
 
-// Delete route
 app.post('/delete/:appName', (req, res) => {
     const appName = req.params.appName;
     servers = servers.filter(server => server.appName !== appName);
     saveServers();
-    res.redirect('/');
+    res.redirect('/server/diagram/list');
 });
 
-// Function to save servers to JSON file
 function saveServers() {
     fs.writeFileSync(serversFilePath, JSON.stringify(servers, null, 2));
 }
 
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
